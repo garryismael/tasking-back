@@ -1,7 +1,6 @@
 package com.godigital.tasking.person.domain;
 
 import java.util.HashMap;
-import java.util.Map;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
@@ -21,22 +20,7 @@ public class DeletePersonInteractor implements DeletePersonUseCase {
 
   @Override
   public Mono<Void> execute(String id) {
-    Mono<Person> personMono = this.personService.findOneById(id);
-
-    Map<String, String> errors = new HashMap<>();
-
-    return personMono
-      .flatMap(person -> {
-        this.personService.delete(id);
-        return Mono.empty();
-      })
-      .switchIfEmpty(
-        Mono.defer(() -> {
-          return Mono.just(
-            personPresenter.prepareResourceNotFoundView(id, errors)
-          );
-        })
-      )
-      .then();
+    this.personService.delete(id).then(Mono.empty());
+    return Mono.empty();
   }
 }
